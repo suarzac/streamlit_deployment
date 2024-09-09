@@ -1,7 +1,7 @@
-# base image
 FROM python:3.9-slim
 
-#basic build prep
+WORKDIR /app
+
 RUN apt-get update && apt-get install -y \
     build-essential \
     curl \
@@ -9,21 +9,12 @@ RUN apt-get update && apt-get install -y \
     git \
     && rm -rf /var/lib/apt/lists/*
 
-# streamlit-specific commands
-RUN mkdir -p /root/.streamlit
-RUN bash -c 'echo -e "\
-[general]\n\
-email = \"\"\n\
-" > /root/.streamlit/credentials.toml'
-RUN bash -c 'echo -e "\
-[server]\n\
-enableCORS = false\n\
-" > /root/.streamlit/config.toml'
+RUN git clone https://github.com/streamlit/streamlit-example.git .
 
-# copy over and install packages
-COPY ./src/requirements.txt ./requirements.txt
-RUN pip3 install cython
 RUN pip3 install -r requirements.txt
 
-# copying everything over
-COPY . .
+EXPOSE 8501
+
+HEALTHCHECK CMD curl --fail http://localhost:8501/_stcore/health
+
+ENTRYPOINT ["streamlit", "run", "streamlit_app.py", "--server.port=8501", "--server.address=0.0.0.0"]

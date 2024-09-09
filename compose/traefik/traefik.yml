@@ -19,16 +19,20 @@ certificatesResolvers:
   letsencrypt:
     # https://docs.traefik.io/master/https/acme/#lets-encrypt
     acme:
-      email: "example@test.com"
+      email: "suarzac@icloud.com"
       storage: /etc/traefik/acme/acme.json
       # https://docs.traefik.io/master/https/acme/#httpchallenge
-      httpChallenge:
-        entryPoint: web
+      dnsChallenge:
+        provider: cloudflare
+        resolvers:
+          - "1.1.1.1:53"
+          - "1.0.0.1:53"
+        delayBeforeCheck: "0"
 
 http:
   routers:
     web-secure-router:
-      rule: "Host(`example.com`)"
+      rule: "Host(`streamlit.suarzac.com`)"
       entryPoints:
         - web-secure
       middlewares:
